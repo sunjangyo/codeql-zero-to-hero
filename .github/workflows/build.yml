@@ -58,15 +58,18 @@ jobs:
           mkdir -p out
 
           codeql database analyze \
-              --format=csv \
-              --output=out.csv \
+              --format=sarif-latest \
+              --output=out.sarif \
               example-codeql-db \
-              3/2/query.ql
+              3/5/query.ql
 
-          ls -l
-          cp out.csv out
+          #codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
+          #codeql bqrs decode out.bqrs --format=json --output=out.json
 
           # hasil ke out
+          cp out.sarif out
+          ls -l
+
 
 
       - name: Kompres

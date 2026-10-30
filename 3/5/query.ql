@@ -15,18 +15,12 @@ class ExecuteCall extends DataFlow::CallCfgNode {
 predicate executeNotLiteral(DataFlow::CallCfgNode call) {
         exists(DataFlow::ExprNode expr |
                 call instanceof ExecuteCall
-        		and DataFlow::localFlow(expr, call.getArg(0))
-        		and expr instanceof DataFlow::LocalSourceNode
-        		and not expr.getNode().isLiteral()
+                and DataFlow::localFlow(expr, call.getArg(0))
+                and expr instanceof DataFlow::LocalSourceNode
+                and not expr.getNode().isLiteral()
         )
 }
 
 from DataFlow::CallCfgNode call
 where executeNotLiteral(call)
-
-select
-    call.getLocation().getFile().getRelativePath(),
-    call.getLocation().getStartLine(),
-    call.getLocation().getStartColumn(),
-	"Call to django.db execute with an argument that is not a literal"
-
+select call, "Call to django.db execute with an argument that is not a literal"
