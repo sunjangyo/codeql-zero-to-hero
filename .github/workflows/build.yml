@@ -61,13 +61,14 @@ jobs:
               --format=sarif-latest \
               --output=out.sarif \
               example-codeql-db \
-              3/5/query.ql
+              3/5/query.ql | tee log.txt
 
           #codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
           #codeql bqrs decode out.bqrs --format=json --output=out.json
 
           # hasil ke out
           cp out.sarif out
+          cp out.log out
           ls -l
 
 
