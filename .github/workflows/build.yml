@@ -30,9 +30,26 @@ jobs:
       - name: Download codeql
         if: steps.cache-codeql.outputs.cache-hit != 'true'
         run: |
+          echo "=================== new codeql =========================="
           wget -q https://github.com/github/codeql-action/releases/download/${{ env.CODEQL_VERSION }}/codeql-bundle-linux64.tar.gz
           tar xzf codeql-bundle-linux64.tar.gz
           rm codeql-bundle-linux64.tar.gz
+
+
+      - name: Cache CodeQL database
+        id: cache-codeql-db
+        uses: actions/cache@v4
+        with:
+          path: example-codeql-db
+          key: example-codeql-db
+
+      - name: Create database
+        if: steps.cache-codeql-db.outputs.cache-hit != 'true'
+        run: |
+          export PATH="`pwd`/codeql:$PATH"
+
+          echo "=================== new create database =========================="
+          codeql database create example-codeql-db --language=python
 
 
       - name: Analyze
@@ -40,14 +57,13 @@ jobs:
           export PATH="`pwd`/codeql:$PATH"
           mkdir -p out
 
-          codeql database create example-codeql-db --language=python
 
           codeql query run 3/2/query1.ql --database=example-codeql-db --output=out.bqrs
 
           codeql bqrs decode out.bqrs --format=json --output=out.json
 
           ls -l
-          cp out.bqrs out
+          cp out.json out
 
           # hasil ke out
 
