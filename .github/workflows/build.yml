@@ -57,12 +57,20 @@ jobs:
           export PATH="`pwd`/codeql:$PATH"
           mkdir -p out
 
-          codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
+          codeql database analyze \
+              --format=sarif-latest \
+              --output=out.sarif \
+              example-codeql-db \
+              3/2/query.ql
 
-          codeql bqrs decode out.bqrs --format=json --output=out.json
+          # sarif to text
+          jq -r '.runs[].results[] | select(.codeFlows) |
+            "== \(.ruleId): \(.message.text)",
+            (.codeFlows[0].threadFlows[0].locations[] |
+              "   \(.location.physicalLocation.artifactLocation.uri):\(.location.physicalLocation.region.startLine)  \(.location.message.text // "")")' out.sarif > out.txt
 
           ls -l
-          cp out.json out
+          cp out.txt out
 
           # hasil ke out
 
