@@ -58,20 +58,13 @@ jobs:
           mkdir -p out
 
           codeql database analyze \
-              --format=sarif-latest \
-              --output=out.sarif \
+              --format=csv \
+              --output=out.csv \
               example-codeql-db \
               3/2/query.ql
 
-          # sarif to text
-          jq -r '.runs[].results[] | select(.codeFlows) |
-            "== \(.ruleId): \(.message.text)",
-            (.codeFlows[0].threadFlows[0].locations[] |
-              "   \(.location.physicalLocation.artifactLocation.uri):\(.location.physicalLocation.region.startLine)  \(.location.message.text // "")")' out.sarif > out.txt
-
           ls -l
-          cp out.sarif out
-          cp out.txt out
+          cp out.csv out
 
           # hasil ke out
 
