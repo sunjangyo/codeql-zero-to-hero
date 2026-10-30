@@ -57,8 +57,7 @@ jobs:
           export PATH="`pwd`/codeql:$PATH"
           mkdir -p out
 
-
-          codeql query run 3/2/query1.ql --database=example-codeql-db --output=out.bqrs
+          codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
 
           codeql bqrs decode out.bqrs --format=json --output=out.json
 
