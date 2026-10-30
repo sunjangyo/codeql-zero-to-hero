@@ -23,4 +23,11 @@ predicate executeNotLiteral(DataFlow::CallCfgNode call) {
 
 from DataFlow::CallCfgNode call
 where executeNotLiteral(call)
-select call, "Call to django.db execute with an argument that is not a literal"
+
+select
+    call.asSource(),
+    call.getLocation().getFile().getRelativePath(),
+    call.getLocation().getStartLine(),
+    call.getLocation().getStartColumn(),
+	"Call to django.db execute with an argument that is not a literal"
+
