@@ -25,7 +25,6 @@ from DataFlow::CallCfgNode call
 where executeNotLiteral(call)
 
 select
-    call.asSource(),
     call.getLocation().getFile().getRelativePath(),
     call.getLocation().getStartLine(),
     call.getLocation().getStartColumn(),
