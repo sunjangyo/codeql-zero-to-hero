@@ -1,0 +1,67 @@
+name: Analyze Program container
+
+on:
+  push:
+    branches: [jin-cli]
+  pull_request:
+    branches: [jin-cli]
+
+
+permissions:
+  contents: write   # wajib untuk membuat release
+
+env:
+  CODEQL_VERSION: codeql-bundle-v2.23.9
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache CodeQL
+        id: cache-codeql
+        uses: actions/cache@v4
+        with:
+          path: codeql
+          key: codeql-${{ runner.os }}-${{ env.CODEQL_VERSION }}
+
+      - name: Download codeql
+        if: steps.cache-codeql.outputs.cache-hit != 'true'
+        run: |
+          wget -q https://github.com/github/codeql-action/releases/download/${{ env.CODEQL_VERSION }}/codeql-bundle-linux64.tar.gz
+          tar xzf codeql-bundle-linux64.tar.gz
+          rm codeql-bundle-linux64.tar.gz
+
+
+      - name: Analyze
+        run: |
+          export PATH="`pwd`/codeql:$PATH"
+          mkdir -p out
+
+          codeql database create example-codeql-db --language=python
+
+          codeql query run 3/2/query1.ql --database=example-codeql-db --output=out.bqrs
+          codeql bqrs decode out.bqrs --format=csv
+          ls -l
+
+          # hasil ke out
+
+
+      - name: Kompres
+        run: |
+          sudo chown -R $USER out
+          tar czvf result.tar.gz \
+            -C out .
+
+      - name: Buat release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: aircrack-db
+          name: aircrack-db
+          files: |
+            result.tar.gz
+
+
+
