@@ -43,7 +43,9 @@ jobs:
           codeql database create example-codeql-db --language=python
 
           codeql query run 3/2/query1.ql --database=example-codeql-db --output=out.bqrs
-          codeql bqrs decode out.bqrs --format=csv
+
+          codeql bqrs decode out.bqrs --format=json --output=out.json
+
           ls -l
           cp out.bqrs out
 
@@ -59,8 +61,8 @@ jobs:
       - name: Buat release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: aircrack-db
-          name: aircrack-db
+          tag_name: myresult
+          name: myresult
           files: |
             result.tar.gz
 
