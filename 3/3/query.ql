@@ -7,8 +7,16 @@
 import python
 import semmle.python.ApiGraphs
 
-select API::moduleImport("flask").getMember("request").getMember("args").asSource(), "Flask request.args source"
+from API::Node source
+where
+    source =
+        API::moduleImport("flask")
+            .getMember("request")
+            .getMember("args")
 
-// Note that you can also use a wildcard to query for any method of the request object, for example:
-
-// select API::moduleImport("flask").getMember("request").getMember(_).asSource()
+select
+    source.asSource(),
+    source.getLocation().getFile().getRelativePath(),
+    source.getLocation().getStartLine(),
+    source.getLocation().getStartColumn(),
+    "Flask request.args source"
