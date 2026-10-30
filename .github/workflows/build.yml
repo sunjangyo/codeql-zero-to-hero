@@ -59,10 +59,10 @@ jobs:
 
           codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
 
-          codeql bqrs decode out.bqrs --format=json --output=out.json
+          codeql bqrs decode out.bqrs --format=csv --output=out.csv
 
           ls -l
-          cp out.json out
+          cp out.csv out
 
           # hasil ke out
 
