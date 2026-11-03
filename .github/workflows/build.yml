@@ -2,8 +2,7 @@ name: CodeQL Scan
 
 on:
   push:
-    branches:
-      - query-cloud
+    branches: [query-cloud]
 
   workflow_dispatch:
 
