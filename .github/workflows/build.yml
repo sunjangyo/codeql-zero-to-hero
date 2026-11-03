@@ -1,92 +1,36 @@
-name: Analyze Program container
+name: CodeQL Scan
 
 on:
   push:
-    branches: [jin-cli]
-  pull_request:
-    branches: [jin-cli]
+    branches:
+      - query-cloud
 
+  workflow_dispatch:
 
 permissions:
-  contents: write   # wajib untuk membuat release
-
-env:
-  CODEQL_VERSION: codeql-bundle-v2.23.9
+  contents: read
+  security-events: write # memberi izin untuk mengirim hasil sarif ke github
+  actions: read
 
 jobs:
-  build:
+  analyze:
+    name: Analyze Python
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      # 1. Download repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Cache CodeQL
-        id: cache-codeql
-        uses: actions/cache@v4
+      # 2. Initialize CodeQL
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
         with:
-          path: codeql
-          key: codeql-${{ runner.os }}-${{ env.CODEQL_VERSION }}
+          languages: python
+          queries: security-extended #keamanan tambahan milik github
 
-      - name: Download codeql
-        if: steps.cache-codeql.outputs.cache-hit != 'true'
-        run: |
-          echo "=================== new codeql =========================="
-          wget -q https://github.com/github/codeql-action/releases/download/${{ env.CODEQL_VERSION }}/codeql-bundle-linux64.tar.gz
-          tar xzf codeql-bundle-linux64.tar.gz
-          rm codeql-bundle-linux64.tar.gz
-
-
-      - name: Cache CodeQL database
-        id: cache-codeql-db
-        uses: actions/cache@v4
+      # 3. Analyze source code
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
         with:
-          path: example-codeql-db
-          key: example-codeql-db
-
-      - name: Create database
-        if: steps.cache-codeql-db.outputs.cache-hit != 'true'
-        run: |
-          export PATH="`pwd`/codeql:$PATH"
-
-          echo "=================== new create database =========================="
-          codeql database create example-codeql-db --language=python
-
-
-      - name: Analyze
-        run: |
-          export PATH="`pwd`/codeql:$PATH"
-          mkdir -p out
-
-          codeql database analyze \
-              --format=sarif-latest \
-              --output=out.sarif \
-              example-codeql-db \
-              3/6/query.ql | tee log.txt
-
-          #codeql query run 3/2/query.ql --database=example-codeql-db --output=out.bqrs
-          #codeql bqrs decode out.bqrs --format=json --output=out.json
-
-          # hasil ke out
-          cp out.sarif out
-
-          cp log.txt out
-          ls -l
-
-
-
-      - name: Kompres
-        run: |
-          sudo chown -R $USER out
-          tar czvf result.tar.gz \
-            -C out .
-
-      - name: Buat release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: myresult
-          name: myresult
-          files: |
-            result.tar.gz
-
-
-
+          category: "/language:python"
