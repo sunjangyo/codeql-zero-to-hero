@@ -21,7 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Initialize CodeQL
+      # 2. Initialize CodeQLzzzzzzzzz
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
