@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  security-events: write # memberi izin untuk mengirim hasil sarif ke github
+  security-events: write # memberi izin untuk mengirim hasil sarif ke githubbb
   actions: read
 
 jobs:
